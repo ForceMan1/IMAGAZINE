@@ -6,4 +6,8 @@ package forceman.entity;
 public class Group {
     private int id;
     private String name;
+
+    public Group(String name){
+        this.name = name;
+    }
 }
