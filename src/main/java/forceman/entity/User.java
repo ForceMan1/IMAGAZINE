@@ -121,7 +121,7 @@ public class User {
         this.password = password;
     }
 
-    public boolean isActive() {
+    public boolean getActive() {
         return active;
     }
 
