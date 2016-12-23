@@ -1,5 +1,6 @@
 package dao;
 
+import forceman.dao.DAOException;
 import forceman.dao.jdbc.impl.MysqlJdbcUserDAO;
 import forceman.entity.User;
 import org.junit.After;
@@ -7,6 +8,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.security.SecureRandom;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -34,7 +36,8 @@ public class JdbcUserDAOJUnitTest  extends Assert {
     }
 
     @Test
-    public void createuser() throws SQLException {
+    public void createuser() throws DAOException {
+        //SecureRandom
         Date date = null;
         try {
             date = new SimpleDateFormat("yyyy-MM-dd").parse("1980-11-24");

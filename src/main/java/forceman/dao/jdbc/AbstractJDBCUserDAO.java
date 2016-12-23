@@ -78,11 +78,12 @@ abstract public class AbstractJDBCUserDAO implements IUserDAO {
         PreparedStatement prepStmt = null;
         try {
             prepStmt = conn.prepareStatement(SQL_CREATE_USER);
+            // fio, birthday, login, password, active
             prepStmt.setString(1, user.getFio());
-            prepStmt.setString(2, user.getLogin());
-            prepStmt.setString(3, user.getPassword());
-            prepStmt.setBoolean(4, user.getActive());
-            prepStmt.setDate(1, new java.sql.Date(user.getBirthday().getTime()));
+            prepStmt.setDate(2, new java.sql.Date(user.getBirthday().getTime()));
+            prepStmt.setString(3, user.getLogin());
+            prepStmt.setString(4, user.getPassword());
+            prepStmt.setBoolean(5, user.getActive());
             return prepStmt.executeUpdate();
         }catch(SQLException sqlExc){
             throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_USER_CREATE.name(), sqlExc);
