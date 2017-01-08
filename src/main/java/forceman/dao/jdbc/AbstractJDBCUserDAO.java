@@ -5,15 +5,12 @@ import forceman.dao.DAOExceptionSource;
 import forceman.dao.IUserDAO;
 import forceman.entity.User;
 import forceman.security.IPasswordHash;
-import forceman.security.PasswordHash;
 
-import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -24,45 +21,45 @@ abstract public class AbstractJDBCUserDAO implements IUserDAO<Integer> {
     /**
      * Наименование таблицы пользователей в БД
      */
-    public static final String USERS_TABLE = "users";
+    public static final String USER_TABLE = "users";
     /**
      * Скрипт создания нового пользователя
      */
-   public static final String SQL_CREATE_USER = "INSERT INTO " + USERS_TABLE + " (id, fio, birthday, login, password, salt, active) " +
+   public static final String SQL_CREATE_USER = "INSERT INTO " + USER_TABLE + " (id, fio, birthday, login, password, salt, active) " +
             "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
     /**
      * Скрипт удаления пользователя
      */
-    public static final String SQL_DELETE_USER = "DELETE FROM " + USERS_TABLE + " WHERE id=?";
+    public static final String SQL_DELETE_USER = "DELETE FROM " + USER_TABLE + " WHERE id=?";
 
     /**
      * Скрипт поиска пользователя по его идентификатору
      */
-    public static final String SQL_FIND_USER_BY_ID = "SELECT id, fio, birthday, login, active FROM " + USERS_TABLE +
+    public static final String SQL_FIND_USER_BY_ID = "SELECT id, fio, birthday, login, active FROM " + USER_TABLE +
                                                                                                 " where id = ?";
 
     /**
      * Скрипт обновления данных пользователя (без обновления пароля)
      */
-    public static final String SQL_UPDATE_USER = "UPDATE " + USERS_TABLE + " SET fio = ?, birthday = ?, " +
+    public static final String SQL_UPDATE_USER = "UPDATE " + USER_TABLE + " SET fio = ?, birthday = ?, " +
             "login = ?, active = ? WHERE id = ?";
 
     /**
      * Скрипт обновления данных пользователя (с обновлением пароля)
      */
-    public static final String SQL_UPDATE_USER_WITH_PASSWORD = "UPDATE " + USERS_TABLE + " SET fio = ?, birthday = ?, " +
+    public static final String SQL_UPDATE_USER_WITH_PASSWORD = "UPDATE " + USER_TABLE + " SET fio = ?, birthday = ?, " +
             "login = ?, password = ?, salt = ? , active = ? WHERE id = ?";
 
     /**
      * Скрипт получения количества пользователей
      */
-    public static final String SQL_COUNT_USER = "SELECT COUNT(id) FROM " + USERS_TABLE;
+    public static final String SQL_COUNT_USER = "SELECT COUNT(id) FROM " + USER_TABLE;
 
     /**
      * Скрипт существования логина в таблице пользователец
      */
-    public static final String SQL_FIND_LOGIN = "SELECT login FROM " + USERS_TABLE + " WHERE login = ?";
+    public static final String SQL_FIND_LOGIN = "SELECT login FROM " + USER_TABLE + " WHERE login = ?";
 
 
 

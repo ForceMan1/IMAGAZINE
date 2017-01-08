@@ -16,7 +16,9 @@ public enum DAOExceptionSource {
     EXCEPTION_DAO_USER_CREATE_PASSWORD(""),
     EXCEPTION_DAO_USER_AUTHENTICATE(""),
     EXCEPTION_DAO_USER_FIND_LOGIN("При проверке существования логина произошла ошибка"),
-    EXCEPTION_DAO_USER_FIND_LOGIN_ILLEGAL_ARGUMENT("Введен некорректный логин");
+    EXCEPTION_DAO_USER_FIND_LOGIN_ILLEGAL_ARGUMENT("Введен некорректный логин"),
+
+    EXCEPTION_DAO_GROUP_DELETE("Ошибка при удалении группы пользователей");
 
     /**
      *
