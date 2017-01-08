@@ -1,9 +1,11 @@
 package security;
 
+import forceman.security.IPasswordHash;
 import forceman.security.PasswordHash;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 /**
@@ -11,12 +13,17 @@ import java.util.Arrays;
  */
 public class HashSaltedPasswordJUnitTest extends Assert{
     @Test
-    public void testHash(){
-        String salt = Arrays.toString(PasswordHash.getNextSalt());
-        String hash = PasswordHash.createHash("qwerty123456", salt);
+    public void testHash() throws NoSuchAlgorithmException {
+        IPasswordHash passwordHashImpl = new PasswordHash("SHA-256");
+        String salt = passwordHashImpl.getNextSalt(); //Arrays.toString( passwordHashImpl.getNextSalt() );
+        String hash =  passwordHashImpl.createHash("qwerty123456", salt);
         System.out.println("salt " + salt);
         System.out.println("hash: " + hash);
-        assertTrue(PasswordHash.authenticate("qwerty123458", hash, salt));
+
+
+        String newHash = passwordHashImpl.createHash("qwerty123455", salt);
+        assertTrue(hash.equals(newHash));
+        //assertTrue(PasswordHash.authenticate("qwerty123458", hash, salt));
     }
 
 

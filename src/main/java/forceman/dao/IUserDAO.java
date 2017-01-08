@@ -8,42 +8,19 @@ import java.util.List;
 /**
  * Created by Igor on 22.12.2016.
  */
-public interface IUserDAO {
-    /**
-     * Создание нового пользователя
-     * @param user Обяъект класса {@link User}
-     * @return 1 - в случае успешного добавления пользователя
-     */
-    public int createUser(User user) throws DAOException;
+public interface IUserDAO<V extends Number> extends IBaseEntityDAO<User, V>{
 
     /**
-     * Удаление пользователя
+     * Обновление данных клиента с новым паролем
+     * @param user обновляемый экземпляр класса {@link User}
      */
-    public int deleteUser(User user) throws DAOException;
+    public int updateWithPassword(User user) throws DAOException;
 
     /**
-     * Поиск пользователя по идентификатору
+     * Проверка существования в таблице пользователя записи с указанным логином
+     * @param login Логин
+     * @return true, если данный логин уже имеется в таблице пользователей
      */
-    public User findUserById(int id) throws DAOException;
+    public boolean isLoginExists(String login) throws DAOException;
 
-    /**
-     * Обновление данных клиента
-     */
-    public int updateUser(User user) throws DAOException;
-
-    /**
-     * Получение количества пользователей
-     */
-    public int getCountUsers() throws DAOException;
-
-    /**
-     * Получения списка пользователей
-     * @param offset Начальный индекс записи начала вывода
-     * @param limit Максимальное количество выводимых клиентов. Если = -1, то без ограничения
-     */
-    public List<User> getListUsers(int offset, int limit) throws DAOException;
-
-    /**
-     * Поиск пользователя по идентификатору {@link User#id}
-     */
 }

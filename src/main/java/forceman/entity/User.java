@@ -9,12 +9,7 @@ import java.util.List;
  *  @version 2016212101
  *
  */
-public class User {
-    /**
-     * Уникальный идентификатор пользователя
-     */
-    private int id;
-
+public class User extends BaseEntity<Integer> {
     /**
      * ФИО пользователя
      */
@@ -45,21 +40,7 @@ public class User {
      */
     private List<Group> groups;
 
-    /**
-     * Функция получения идентификатора пользователя {@link User#id}
-     * @return идентификатор пользователя
-     */
-    public int getId() {
-        return id;
-    }
 
-    /**
-     * Функция установки идентификатора пользователч
-     * @param id Новый идентификатор пользователя {@link User#id}
-     */
-    public void setId(int id) {
-        this.id = id;
-    }
 
     /**
      * Функция получения ФИО пользователя {@link User#fio}
@@ -138,12 +119,34 @@ public class User {
     }
 
 
-
+    /**
+     * Конструктор без инициализации пароля
+     * @param fio ФИО пользователя {@link User#fio}
+     * @param birthday Дата рождения пользователя {@link User#birthday}
+     * @param login Логин пользователя {@link User#login}
+     * @param active Флаг активности пользователя {@link User#active}
+     */
     public User(String fio, Date birthday, String login, boolean active) {
         this.fio = fio;
         this.birthday = birthday;
         this.login = login;
         this.active = active;
+    }
+
+    /**
+     * Конструктор с инициализацией пароля
+     * @param fio ФИО пользователя {@link User#fio}
+     * @param birthday Дата рождения пользователя {@link User#birthday}
+     * @param login Логин пользователя {@link User#login}
+     * @param password Пароль пользователя {@link User#password}
+     * @param active Флаг активности пользователя {@link User#active}
+     */
+    public User(String fio, Date birthday, String login, String password, boolean active) {
+        this.fio = fio;
+        this.birthday = birthday;
+        this.login = login;
+        this.active = active;
+        this.password = password;
     }
 
 

@@ -7,44 +7,71 @@ import java.security.SecureRandom;
 
 /**
  * Created by Igor on 23.12.2016.
+ * Класс получения хешей + соль для паролей
+ * Поддерживаются следующие криптоалгоритмы:
+ * MD5
+ * SHA-1
+ * SHA-256
  */
-public class PasswordHash {
-    public static byte[] getNextSalt(){
+public class PasswordHash implements IPasswordHash {
+    /**
+     * Криптоалгоритм формирования хеша
+     */
+    private String algoritm;
+
+    /**
+     * Функция получения значения поля {@link PasswordHash#algoritm}
+     * @return наименование крипто алгоритма формирования хеша
+     */
+    public String getAlgoritm(){
+        return algoritm;
+    }
+
+    /**
+     * Конструктор класса {@link PasswordHash}
+     * @param algoritm Алгоритм формирования хеша пароля (MD5, SHA-1б SHA-256)
+     */
+    public PasswordHash(String algoritm){
+        this.algoritm = algoritm;
+    }
+    /**
+     * Создание соли для пароля
+     * @return соль для пароля
+     */
+    public String getNextSalt(){
         SecureRandom sRandom =  new SecureRandom();
         byte[] bytes = new byte[20];
         sRandom.nextBytes(bytes);
-        return bytes;
+        return new BigInteger(bytes).toString(16);
     }
 
-    public static String createHash(String password, String salt) {
-        /*
-        MessageDigest md = MessageDigest.getInstance("SHA-256");
-        md.update( new String(password + salt).getBytes() );
-        byte[] byteData = md.digest();
-        //convert the byte to hex format method 1
-        StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < byteData.length; i++) {
-            sb.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
-        }
-        System.out.println("Hex format : " + sb.toString());
-        return sb.toString();
-        */
+    /**
+     *  Создание хеша по заданному парролю и соли
+     * @param password Пароль
+     * @param salt Сгенерированная соль
+     * @return Хеш пароля + соль
+     * @throws NoSuchAlgorithmException При указании некорректного названия алгоритма (разрешенные значения: MD5, SHA-1б SHA-256)
+     * @throws IllegalArgumentException При указании в качестве аргументов данного метода значения null
+     */
+    public String createHash(String password, String salt) throws NoSuchAlgorithmException, IllegalArgumentException {
+        if(password == null || salt == null)
+            throw new IllegalArgumentException();
         MessageDigest messageDigest=null;
-        try {
-            messageDigest = MessageDigest.getInstance("SHA");
-            messageDigest.update((password+salt).getBytes());
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
+        messageDigest = MessageDigest.getInstance(algoritm);
+        messageDigest.update((password+salt).getBytes());
+
         String encryptedPassword = (new BigInteger(messageDigest.digest())).toString(16);
         System.out.println("Encrypted Password: " + encryptedPassword);
         return encryptedPassword;
     }
 
-    public static boolean authenticate(String password, String oldHash, String salt){
-        String newHash = createHash(password, salt);
+    /*
+    public static boolean authenticate(String password, String oldHash, String salt, String algoritm)
+                                                                            throws NoSuchAlgorithmException{
+        String newHash = createHash(password, salt, algoritm);
         return newHash.equals(oldHash);
     }
+    */
 
 
 }
