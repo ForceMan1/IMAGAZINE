@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
-    <file url="file://$PROJECT_DIR$/src/main/java/forceman/dao/DAOException.java" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/src/main/java/forceman/dao/DAOExceptionSource.java" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/src/main/java/forceman/dao/IUserDAO.java" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/src/main/java/forceman/dao/jdbc/AbstractJDBCUserDAO.java" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/src/main/java/forceman/entity/User.java" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/src/main/java/forceman/security/PasswordHash.java" charset="windows-1251" />
+    <file url="PROJECT" charset="windows-1251" />
   </component>
 </project>

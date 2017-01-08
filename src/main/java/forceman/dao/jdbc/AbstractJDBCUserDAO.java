@@ -4,18 +4,23 @@ import forceman.dao.DAOException;
 import forceman.dao.DAOExceptionSource;
 import forceman.dao.IUserDAO;
 import forceman.entity.User;
+import forceman.security.IPasswordHash;
+import forceman.security.PasswordHash;
 
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * Created by Igor on 21.12.2016.d
  * Класс для управления объектами типа User User {@link User}
  */
-abstract public class AbstractJDBCUserDAO implements IUserDAO {
+abstract public class AbstractJDBCUserDAO implements IUserDAO<Integer> {
     /**
      * Наименование таблицы пользователей в БД
      */
@@ -23,8 +28,8 @@ abstract public class AbstractJDBCUserDAO implements IUserDAO {
     /**
      * Скрипт создания нового пользователя
      */
-   public static final String SQL_CREATE_USER = "INSERT INTO " + USERS_TABLE + " (fio, birthday, login, password, active) " +
-            "VALUES (?, ?, ?, ?, ?)";
+   public static final String SQL_CREATE_USER = "INSERT INTO " + USERS_TABLE + " (id, fio, birthday, login, password, salt, active) " +
+            "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
     /**
      * Скрипт удаления пользователя
@@ -38,17 +43,35 @@ abstract public class AbstractJDBCUserDAO implements IUserDAO {
                                                                                                 " where id = ?";
 
     /**
-     * Скрипт обновления данных пользователя
+     * Скрипт обновления данных пользователя (без обновления пароля)
      */
     public static final String SQL_UPDATE_USER = "UPDATE " + USERS_TABLE + " SET fio = ?, birthday = ?, " +
             "login = ?, active = ? WHERE id = ?";
+
+    /**
+     * Скрипт обновления данных пользователя (с обновлением пароля)
+     */
+    public static final String SQL_UPDATE_USER_WITH_PASSWORD = "UPDATE " + USERS_TABLE + " SET fio = ?, birthday = ?, " +
+            "login = ?, password = ?, salt = ? , active = ? WHERE id = ?";
 
     /**
      * Скрипт получения количества пользователей
      */
     public static final String SQL_COUNT_USER = "SELECT COUNT(id) FROM " + USERS_TABLE;
 
-       /**
+    /**
+     * Скрипт существования логина в таблице пользователец
+     */
+    public static final String SQL_FIND_LOGIN = "SELECT login FROM " + USERS_TABLE + " WHERE login = ?";
+
+
+
+    /**
+     * Класс формирования хеша пароля
+     */
+    protected IPasswordHash pswdHashImpl;
+
+    /**
      * Коннектор до БД
      */
     protected Connection conn;
@@ -57,8 +80,9 @@ abstract public class AbstractJDBCUserDAO implements IUserDAO {
      *
      * @param conn Коннектор соединения с БД
      */
-    public AbstractJDBCUserDAO(Connection conn){
+    public AbstractJDBCUserDAO(Connection conn, IPasswordHash pswdHashImpl){
         this.conn = conn;
+        this.pswdHashImpl = pswdHashImpl;
     }
 
    public Connection getConn() {
@@ -71,36 +95,20 @@ abstract public class AbstractJDBCUserDAO implements IUserDAO {
 
     /**
      * Создание нового пользователя
-     * @param user Обяъект класса {@link User}
-     * @return 1 - в случае успешного добавления пользователя
       */
-    public int createUser(User user) throws DAOException {
-        PreparedStatement prepStmt = null;
-        try {
-            prepStmt = conn.prepareStatement(SQL_CREATE_USER);
-            // fio, birthday, login, password, active
-            prepStmt.setString(1, user.getFio());
-            prepStmt.setDate(2, new java.sql.Date(user.getBirthday().getTime()));
-            prepStmt.setString(3, user.getLogin());
-            prepStmt.setString(4, user.getPassword());
-            prepStmt.setBoolean(5, user.getActive());
-            return prepStmt.executeUpdate();
-        }catch(SQLException sqlExc){
-            throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_USER_CREATE.name(), sqlExc);
-        }finally {
-            if(prepStmt != null)
-                try {
-                    prepStmt.close();
-                }catch(SQLException closeExc){
-                    throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_CLOSE_STATEMENT.name(), closeExc);
-                }
-        }
-    }
+    abstract public User create(User user) throws DAOException;
+
+    /**
+     * Получения списка экземпляров класса T
+     * @param offset Начальный индекс записи начала вывода
+     * @param limit Максимальное количество выводимых записей. Если = -1, то без ограничения
+     */
+    abstract public List<User> getList(Integer offset, Integer limit) throws DAOException;
 
     /**
      * Удаление пользователя
      */
-    public int deleteUser(User user) throws DAOException {
+    public int delete(User user) throws DAOException {
         PreparedStatement prepStmt = null;
         try {
             prepStmt = conn.prepareStatement(SQL_DELETE_USER);
@@ -121,7 +129,7 @@ abstract public class AbstractJDBCUserDAO implements IUserDAO {
     /**
      * Поиск пользователя по идентификатору
      */
-    public User findUserById(int id) throws DAOException{
+    public User findById(Integer id) throws DAOException{
         PreparedStatement prepStmt = null;
         try {
             prepStmt = conn.prepareStatement(SQL_FIND_USER_BY_ID);
@@ -147,19 +155,70 @@ abstract public class AbstractJDBCUserDAO implements IUserDAO {
     }
 
     /**
-     * Обновление данных клиента
+     * Обновление данных клиента ()
      */
-    public int updateUser(User user) throws DAOException {
+    public int update(User user) throws DAOException {
+        if( user == null )
+            throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_USER_UPDATE.toString());
+        if( user.getFio() == null || user.getFio().trim().isEmpty() )
+            throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_USER_UPDATE.toString());
+        if( user.getBirthday() == null || user.getBirthday().toString().trim().isEmpty() )
+            throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_USER_UPDATE.toString());
+        if( user.getLogin() == null || user.getLogin().trim().isEmpty())
+            throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_USER_UPDATE.toString());
+
         PreparedStatement prepStmt = null;
         try {
-            prepStmt = conn.prepareStatement(SQL_UPDATE_USER);
-            prepStmt.setString(1, user.getFio());
-            prepStmt.setDate(2, new java.sql.Date(user.getBirthday().getTime()));
-            prepStmt.setString(3, user.getLogin());
-            prepStmt.setBoolean(4, user.getActive());
-            prepStmt.setInt(5, user.getId());
-            return prepStmt.executeUpdate();
+              prepStmt = conn.prepareStatement(SQL_UPDATE_USER);
+              prepStmt.setString(1, user.getFio());
+              prepStmt.setDate(2, new java.sql.Date(user.getBirthday().getTime()));
+              prepStmt.setString(3, user.getLogin());
+              prepStmt.setBoolean(4, user.getActive());
+              prepStmt.setInt(5, user.getId());
+              return prepStmt.executeUpdate();
+        }catch(SQLException sqlExc){
+            throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_USER_UPDATE.name(), sqlExc);
+        }finally {
+            if(prepStmt != null)
+                try {
+                    prepStmt.close();
+                }catch(SQLException closeExc){
+                    throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_CLOSE_STATEMENT.name(), closeExc);
+                }
+        }
+    }
 
+    public int updateWithPassword(User user) throws DAOException {
+        if( user == null )
+            throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_USER_UPDATE.toString());
+        if( user.getFio() == null || user.getFio().trim().isEmpty() )
+            throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_USER_UPDATE.toString());
+        if( user.getBirthday() == null || user.getBirthday().toString().trim().isEmpty() )
+            throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_USER_UPDATE.toString());
+        if( user.getLogin() == null || user.getLogin().trim().isEmpty())
+            throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_USER_UPDATE.toString());
+
+        PreparedStatement prepStmt = null;
+        try {
+                String salt = pswdHashImpl.getNextSalt();
+                String saltedPaswd = null;
+                try {
+                    saltedPaswd = pswdHashImpl.createHash(user.getPassword(), salt);
+                    user.setPassword("");
+                }catch ( NoSuchAlgorithmException algExc ){
+                    throw new DAOException( DAOExceptionSource.EXCEPTION_DAO_USER_CREATE_PASSWORD.toString(), algExc );
+                }catch( IllegalArgumentException illegalArgExc) {
+                    throw new DAOException( DAOExceptionSource.EXCEPTION_DAO_USER_CREATE_PASSWORD.toString(), illegalArgExc);
+                }
+                prepStmt = conn.prepareStatement(SQL_UPDATE_USER_WITH_PASSWORD);
+                prepStmt.setString(1, user.getFio());
+                prepStmt.setDate(2, new java.sql.Date(user.getBirthday().getTime()));
+                prepStmt.setString(3, user.getLogin());
+                prepStmt.setString(4, saltedPaswd);
+                prepStmt.setString(5, salt);
+                prepStmt.setBoolean(6, user.getActive());
+                prepStmt.setInt(7, user.getId());
+                return prepStmt.executeUpdate();
         }catch(SQLException sqlExc){
             throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_USER_UPDATE.name(), sqlExc);
         }finally {
@@ -172,10 +231,10 @@ abstract public class AbstractJDBCUserDAO implements IUserDAO {
         }
    }
 
-    /**
+   /**
      * Получение количества пользователей
      */
-    public int getCountUsers() throws DAOException{
+    public int getCount() throws DAOException{
         PreparedStatement prepStmt = null;
         try {
             prepStmt = conn.prepareStatement(SQL_COUNT_USER);
@@ -195,12 +254,33 @@ abstract public class AbstractJDBCUserDAO implements IUserDAO {
         }
      }
 
-    /**
-     * Получения списка пользователей
-     * @param offset Начальный индекс записи начала вывода
-     * @param limit Максимальное количество выводимых клиентов. Если = -1, то без ограничения
+   /**
+     * Проверка существования в таблице пользователя записи с указанным логином
+     * @param login Логин
+     * @return true, если данный логин уже имеется в таблице пользователей
      */
-    abstract public List<User> getListUsers(int offset, int limit) throws DAOException;
-
-
+    public boolean isLoginExists(String login) throws DAOException {
+        PreparedStatement prepStmt = null;
+        ResultSet rs = null;
+        try {
+            if(login == null || login.isEmpty())
+                throw new DAOException( DAOExceptionSource.EXCEPTION_DAO_USER_FIND_LOGIN_ILLEGAL_ARGUMENT.toString() );
+            prepStmt = conn.prepareStatement( SQL_FIND_LOGIN );
+            prepStmt.setString(1, login);
+            rs = prepStmt.executeQuery();
+            if( rs.next() ) {
+                return rs.getObject(1) != null;
+            }else
+                return false;
+        }catch (SQLException sqlExc) {
+            throw new DAOException( DAOExceptionSource.EXCEPTION_DAO_USER_FIND_LOGIN.toString(), sqlExc );
+        }finally {
+            if( prepStmt != null )
+                try {
+                    prepStmt.close();
+                }catch(SQLException exc){
+                    throw new DAOException( DAOExceptionSource.EXCEPTION_DAO_CLOSE_STATEMENT.toString(), exc);
+                }
+        }
+    }
 }
