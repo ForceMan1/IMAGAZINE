@@ -10,6 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.zip.DeflaterOutputStream;
 
 /**
  * Created by Igor on 21.12.2016.
@@ -99,7 +100,7 @@ abstract public class AbstractJDBCGroupDAO implements IGroupDAO<Integer> {
             throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_GROUP_DELETE.toString(), sqlExc);
         }finally {
             try {
-                conn.close();
+                prepStmt.close();
             }catch(SQLException excClose){
                 throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_CLOSE_STATEMENT.toString(), excClose);
             }
@@ -110,30 +111,58 @@ abstract public class AbstractJDBCGroupDAO implements IGroupDAO<Integer> {
      * Поиск группы пользователей по идентификатору
      *
      * @param id Идентификатор группы пользователей
-     * @return объект класса {@link Group}, соотвествующий указанному идентификатору группы пользователей
+     * @return объект класса {@link Group}, соотвествующий указанному идентификатору группы пользователей, или null - при отсутствии
      */
     @Override
     public Group findById(Integer id) throws DAOException {
         PreparedStatement prepStmt = null;
         try {
+            if( id == null )
+                return null;
             prepStmt = conn.prepareStatement(SQL_FIND_GROUP_BY_NAME);
             ResultSet rs = prepStmt.executeQuery();
+            Group group = null;
             if(rs.next()) {
-                Group group = new Group(rs.getString("name"));
+                group = new Group(rs.getString("name"));
                 group.setId(rs.getInt("id"));
             }
             return group;
+        }catch(SQLException sqlExc){
+            throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_GROUP_FIND_BY_ID.toString(), sqlExc);
+        }finally {
+            try {
+                prepStmt.close();
+            }catch(SQLException closeExc){
+                throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_CLOSE_STATEMENT.toString(), closeExc);
+            }
         }
     }
 
     /**
      * Обновление группы пользователей в БД по указанным в параметре новым данным
      *
-     * @param entity Объект класса {@link Group}, содержащий обновленные данные для обновляемой группы пользователей. Поле {@link Group#id} обязательно для заполнения
+     * @param group Объект класса {@link Group}, содержащий обновленные данные для обновляемой группы пользователей. Поле {@link Group#id} обязательно для заполнения
      */
     @Override
-    public int update(Group entity) throws DAOException {
-        return 0;
+    public int update(Group group) throws DAOException {
+        PreparedStatement prepStmt = null;
+        try {
+            if( group == null || group.getId() == null )
+                return 0;
+            prepStmt = conn.prepareStatement(SQL_UPDATE_GROUP);
+            prepStmt.setInt(1, group.getId());
+            return prepStmt.executeUpdate();
+
+        }catch(SQLException sqlExc){
+            throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_GROUP_UPDATE.toString(), sqlExc);
+        }finally{
+            try {
+                if( prepStmt != null)
+                prepStmt.close();
+            }catch(SQLException closeExc){
+                throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_CLOSE_STATEMENT.toString(), closeExc);
+            }
+        }
     }
 
     /**
@@ -142,7 +171,23 @@ abstract public class AbstractJDBCGroupDAO implements IGroupDAO<Integer> {
      */
     @Override
     public int getCount() throws DAOException {
-        return 0;
+        PreparedStatement prepStmt = null;
+        try {
+            prepStmt = conn.prepareStatement(SQL_COUNT_GROUP);
+            ResultSet rs = prepStmt.executeQuery();
+            if(rs.next())
+                return rs.getInt(1);
+            return 0;
+        }catch (SQLException sqlExc){
+            throw new DAOException( DAOExceptionSource.EXCEPTION_DAO_GROUP_COUNT.toString(), sqlExc );
+        }finally {
+            if( prepStmt != null )
+                try {
+                    prepStmt.close();
+                }catch(SQLException closeExc){
+                    throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_CLOSE_STATEMENT.toString(), closeExc);
+                }
+        }
     }
 
     /**
@@ -152,7 +197,5 @@ abstract public class AbstractJDBCGroupDAO implements IGroupDAO<Integer> {
      * @param limit  Максимальное количество выводимых записей. Если = -1, то без ограничения
      */
     @Override
-    public List<Group> getList(Integer offset, Integer limit) throws DAOException {
-        return null;
-    }
+    abstract public List<Group> getList(Integer offset, Integer limit) throws DAOException;
 }

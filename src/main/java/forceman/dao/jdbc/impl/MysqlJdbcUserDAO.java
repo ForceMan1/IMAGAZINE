@@ -18,14 +18,15 @@ import java.util.List;
 
 /**
  * Created by Igor on 22.12.2016.
- * Реализация класса операций над объектами класса {@link User} для использования с СУБД MySQL или PostreSQL
+ * Реализация класса операций над объектами класса {@link User} для использования с СУБД MySQL
  * в связи с использованием комбинации LIMIT ... OFFSET для выборки пользователей
+ * и реализации хранимых процедур эмуляции функции nextval()
  */
 public class MysqlJdbcUserDAO extends AbstractJDBCUserDAO {
     /**
      * Скрипт получения списка пользователей
      */
-    public static final String SQL_LIST_USER = "SELECT id, fio, birthday, login, active FROM users LIMIT ? OFFSET ?";
+    public static final String SQL_LIST_USER = "SELECT id, fio, birthday, login, active FROM " + USER_TABLE + " LIMIT ? OFFSET ?";
 
     /**
      * Скрипт инициализации таблицы последовательностей для таблицы пользователей
