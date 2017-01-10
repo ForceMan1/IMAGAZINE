@@ -43,7 +43,7 @@ public class JdbcPermissionDAOJUnitTest extends Assert {
     @Test
     public void _0000_delete_all_permissions() throws DAOException {
         int count = permDAO.getCount();
-        List<Permission> permissions = permDAO.getList(0, count);
+        List<Permission> permissions = permDAO.getList(count, 0);
 
         Iterator<Permission> iterPermission = permissions.iterator();
         while (iterPermission.hasNext()) {
@@ -127,7 +127,7 @@ public class JdbcPermissionDAOJUnitTest extends Assert {
         Permission permission = permDAO.findById(id);
         Assert.assertTrue(permission != null);
         Assert.assertTrue(permission.getName().equals("STOP RULE"));
-        Assert.assertTrue(permission.getCode().equals("DTOP_RULE"));
+        Assert.assertTrue(permission.getCode().equals("STOP_RULE"));
     }
 
     // получение количества прав доступа в БД
@@ -140,7 +140,7 @@ public class JdbcPermissionDAOJUnitTest extends Assert {
     @Test
     public void _4000_delete_all_permissions() throws DAOException {
         int count = permDAO.getCount();
-        List<Permission> permissions = permDAO.getList(0, count);
+        List<Permission> permissions = permDAO.getList(count, 0);
 
         Iterator<Permission> iterPermission = permissions.iterator();
         while( iterPermission.hasNext() ) {

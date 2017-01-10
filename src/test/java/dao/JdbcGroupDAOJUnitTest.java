@@ -38,7 +38,7 @@ public class JdbcGroupDAOJUnitTest extends Assert{
     @Test
     public void _0000_delete_all_groups() throws DAOException {
         int count = groupDAO.getCount();
-        List<Group> groups = groupDAO.getList(0, count);
+        List<Group> groups = groupDAO.getList(count, 0);
 
         Iterator<Group> iterGroup = groups.iterator();
         while (iterGroup.hasNext()) {
@@ -133,7 +133,7 @@ public class JdbcGroupDAOJUnitTest extends Assert{
     @Test
     public void _4000_delete_all_groups() throws DAOException {
         int count = groupDAO.getCount();
-        List<Group> groups = groupDAO.getList(0, count);
+        List<Group> groups = groupDAO.getList(count, 0);
 
         Iterator<Group> iterGroup = groups.iterator();
         while( iterGroup.hasNext() ) {

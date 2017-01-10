@@ -64,8 +64,8 @@ public class MysqlJdbcUserDAO extends AbstractJDBCUserDAO {
         ArrayList<User> users = new ArrayList<>();
         try {
             prepStmt = conn.prepareStatement(SQL_LIST_USER);
-            prepStmt.setInt(1, offset);
-            prepStmt.setInt(2, limit);
+            prepStmt.setInt(1, limit);
+            prepStmt.setInt(2, offset);
 
             ResultSet rs = prepStmt.executeQuery();
             User user = null;

@@ -45,7 +45,7 @@ public class JdbcUserDAOJUnitTest  extends Assert {
     @Test
     public void _0000_delete_all_users() throws DAOException {
         int count = userDAO.getCount();
-        List<User> users = userDAO.getList(0, count);
+        List<User> users = userDAO.getList(count, 0);
 
         Iterator<User> iterUser = users.iterator();
         while (iterUser.hasNext()) {
@@ -136,7 +136,7 @@ public class JdbcUserDAOJUnitTest  extends Assert {
     @Test
     public void _3000_delete_all_users() throws DAOException {
         int count = userDAO.getCount();
-        List<User> users = userDAO.getList(0, count);
+        List<User> users = userDAO.getList(count, 0);
 
         Iterator<User> iterUser = users.iterator();
         while( iterUser.hasNext() ) {

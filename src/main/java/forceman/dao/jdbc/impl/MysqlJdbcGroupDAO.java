@@ -112,8 +112,8 @@ public class MysqlJdbcGroupDAO extends AbstractJDBCGroupDAO {
         List<Group> groups = new ArrayList<>();
         try {
             prepStmt = conn.prepareStatement(SQL_LIST_GROUP);
-            prepStmt.setInt(1, offset);
-            prepStmt.setInt(2, limit);
+            prepStmt.setInt(1, limit);
+            prepStmt.setInt(2, offset);
             ResultSet rs = prepStmt.executeQuery();
             while(rs.next()){
                 Group group = new Group( rs.getString("name") );
