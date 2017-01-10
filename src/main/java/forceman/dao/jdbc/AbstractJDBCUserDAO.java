@@ -111,19 +111,18 @@ abstract public class AbstractJDBCUserDAO implements IUserDAO<Integer> {
 
     /**
      * Удаление пользователя
-     * @param user Объект класса {@link User}, Однозначно характеризующий удаляемого пользователя по идентификатору пользователя
-     *             - поле {@link User#id}
+     * @param id Идентификатор пользователя
      * @return 1 - при удачном удалении пользователя
      * @throws DAOException - в случае возникновения ошибок при выполнении SQL запросов или при передаче в качестве значения - null
      *        в параметр user или его поле id.
      */
-    public int delete(User user) throws DAOException {
-        if( user == null || user.getId() == null )
+    public int deleteById(Integer id) throws DAOException {
+        if( id == null  )
             throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_USER_DELETE.toString(), new NullPointerException());
         PreparedStatement prepStmt = null;
         try {
             prepStmt = conn.prepareStatement(SQL_DELETE_USER);
-            prepStmt.setInt(1, user.getId());
+            prepStmt.setInt(1, id);
             return prepStmt.executeUpdate();
         }catch(SQLException sqlExc){
             throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_USER_DELETE.name(), sqlExc);

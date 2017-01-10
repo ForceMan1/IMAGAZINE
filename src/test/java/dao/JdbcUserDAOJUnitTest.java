@@ -41,7 +41,24 @@ public class JdbcUserDAOJUnitTest  extends Assert {
         //}
     }
 
-    /************ Создание пользователя *****///
+    // Удаление всех созданных пользователей
+    @Test
+    public void _0000_delete_all_users() throws DAOException {
+        int count = userDAO.getCount();
+        List<User> users = userDAO.getList(0, count);
+
+        Iterator<User> iterUser = users.iterator();
+        while (iterUser.hasNext()) {
+            userDAO.deleteById(iterUser.next().getId());
+        }
+
+        System.out.println(userDAO.getCount());
+        assertTrue(userDAO.getCount() == 0);
+
+
+        /************ Создание пользователя *****/
+    }
+
     @Test(expected = DAOException.class)
     public void _0001_create_null_user() throws DAOException {
        userDAO.create(null);
@@ -123,7 +140,7 @@ public class JdbcUserDAOJUnitTest  extends Assert {
 
         Iterator<User> iterUser = users.iterator();
         while( iterUser.hasNext() ) {
-            userDAO.delete(iterUser.next());
+            userDAO.deleteById(iterUser.next().getId());
         }
 
         System.out.println( userDAO.getCount() );

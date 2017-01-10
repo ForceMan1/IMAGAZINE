@@ -21,7 +21,7 @@ public class HashSaltedPasswordJUnitTest extends Assert{
         System.out.println("hash: " + hash);
 
 
-        String newHash = passwordHashImpl.createHash("qwerty123455", salt);
+        String newHash = passwordHashImpl.createHash("qwerty123456", salt);
         assertTrue(hash.equals(newHash));
         //assertTrue(PasswordHash.authenticate("qwerty123458", hash, salt));
     }

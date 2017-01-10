@@ -3,17 +3,13 @@ package dao;
 import forceman.dao.DAOException;
 import forceman.dao.IGroupDAO;
 import forceman.dao.jdbc.impl.MysqlJdbcGroupDAO;
-import forceman.dao.jdbc.impl.MysqlJdbcUserDAO;
 import forceman.entity.Group;
-import forceman.entity.User;
 import org.junit.*;
 import org.junit.runners.MethodSorters;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -25,7 +21,7 @@ import java.util.List;
 public class JdbcGroupDAOJUnitTest extends Assert{
     private Connection conn = null;
     private IGroupDAO<Integer> groupDAO = null;
-    private int id;
+    private static int id;
 
     @Before
     public void initTest() throws SQLException{
@@ -36,6 +32,21 @@ public class JdbcGroupDAOJUnitTest extends Assert{
         //try {
         conn = DriverManager.getConnection(url, username, password);
         groupDAO = new MysqlJdbcGroupDAO(conn);
+    }
+
+    // Удаление всех созданных групп
+    @Test
+    public void _0000_delete_all_groups() throws DAOException {
+        int count = groupDAO.getCount();
+        List<Group> groups = groupDAO.getList(0, count);
+
+        Iterator<Group> iterGroup = groups.iterator();
+        while (iterGroup.hasNext()) {
+            groupDAO.deleteById(iterGroup.next().getId());
+        }
+
+        System.out.println(groupDAO.getCount());
+        assertTrue(groupDAO.getCount() == 0);
     }
 
     /************ Создание группы пользователей *****/
@@ -89,18 +100,19 @@ public class JdbcGroupDAOJUnitTest extends Assert{
         groupDAO.update(group);
     }
 
-     @Test()
+    @Test(expected=DAOException.class)
     public void _1002_update_group_with_null_fields() throws DAOException {
         Group group = new Group(null);
-        int res = groupDAO.update(group);
-        Assert.assertTrue(res == 1);
+        groupDAO.update(group);
+
     }
 
     @Test
     public void _1003_update_group() throws DAOException {
         Group group = new Group("STOP group");
         group.setId(id);
-        assertTrue( groupDAO.update(group) == 1 );
+        int res = groupDAO.update(group);
+        assertTrue( res == 1 );
     }
 
     // поиск группы пользователей по ИД
@@ -125,7 +137,7 @@ public class JdbcGroupDAOJUnitTest extends Assert{
 
         Iterator<Group> iterGroup = groups.iterator();
         while( iterGroup.hasNext() ) {
-            groupDAO.delete(iterGroup.next());
+            groupDAO.deleteById(iterGroup.next().getId());
         }
 
         System.out.println( groupDAO.getCount() );

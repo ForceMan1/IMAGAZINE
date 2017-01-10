@@ -17,9 +17,9 @@ public interface IBaseEntityDAO<T extends BaseEntity, V extends Number> {
 
     /**
      * Удаление
-     * @param entity Удаляемый экземпляр класса T
+     * @param id Удаляемый экземпляр класса T
      */
-    public int delete(T entity) throws DAOException;
+    public int deleteById(V id) throws DAOException;
 
     /**
      * Поиск экземпляра по идентификатору

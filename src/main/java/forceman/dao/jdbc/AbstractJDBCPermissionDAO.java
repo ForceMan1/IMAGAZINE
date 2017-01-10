@@ -96,20 +96,19 @@ abstract public class AbstractJDBCPermissionDAO implements IPermissionDAO<Intege
     /**
      * Удаление права доступа из БД по его идентификатору {@link Permission#id}
      *
-     * @param permission Объект класса права доступа {@link Permission}, однозначно характеризующего
-     *                  удалямое право доступа по его идентификатору {@link Permission#id}
+     * @param id Идентификатор права доступа
      * @return 1 - в случае успешного удаления права доступа
      * @throws DAOException - в случае возникновения ошибок при выполнении SQL запросов или при передаче в качестве значения - null
      *        в параметр permission или его поля
      */
     @Override
-    public int delete(Permission permission) throws DAOException {
-        if( permission == null || permission.getId() == null )
+    public int deleteById(Integer id) throws DAOException {
+        if( id == null )
             throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_PERMISSION_DELETE.toString(), new NullPointerException());
         PreparedStatement prepStmt = null;
         try {
             prepStmt = conn.prepareStatement(SQL_DELETE_PERMISSION);
-            prepStmt.setInt( 1, permission.getId() );
+            prepStmt.setInt( 1, id );
             return prepStmt.executeUpdate();
         }catch(SQLException sqlExc){
             throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_PERMISSION_DELETE.toString(), sqlExc);

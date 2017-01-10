@@ -78,7 +78,7 @@ abstract public class AbstractJDBCGroupDAO implements IGroupDAO<Integer> {
     /**
      * Создание нового экземпляра класса {@link Group}
      *
-     * @param entity Объект класса @{link Group}
+     * @param id Идентификатор группы пользователей
      * @return сохраненный в БД объект класса {@link Group} с присвоенным ему уникальным идентификатором
      * @throws DAOException - в случае возникновения ошибок при выполнении SQL запросов или при передаче в качестве значения - null
      *
@@ -88,19 +88,18 @@ abstract public class AbstractJDBCGroupDAO implements IGroupDAO<Integer> {
     /**
      * Удаление группы пользователей из БД
      *
-     * @param group Объект класса {@link Group}, однозначно по идентификатору характеризующий удаляемую запись в БД
      * @return 1 - при успешном удалении группы пользователей
      * @throws DAOException - в случае возникновения ошибок при выполнении SQL запросов или при передаче  null
-     *        в качестве параметра group или его поля id
+     *        в параметре id
      */
     @Override
-    public int delete(Group group) throws DAOException {
-        if( group == null || group.getId() != null )
+    public int deleteById(Integer id) throws DAOException {
+        if( id == null  )
             throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_GROUP_DELETE.toString(), new NullPointerException());
         PreparedStatement prepStmt = null;
         try {
             prepStmt = conn.prepareStatement(SQL_DELETE_GROUP);
-            prepStmt.setInt(1, group.getId());
+            prepStmt.setInt(1, id);
             return prepStmt.executeUpdate();
         }catch(SQLException sqlExc){
             throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_GROUP_DELETE.toString(), sqlExc);
@@ -127,7 +126,8 @@ abstract public class AbstractJDBCGroupDAO implements IGroupDAO<Integer> {
         try {
             if( id == null )
                 throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_GROUP_FIND_BY_ID.toString(), new NullPointerException());
-            prepStmt = conn.prepareStatement(SQL_FIND_GROUP_BY_NAME);
+            prepStmt = conn.prepareStatement(SQL_FIND_GROUP_BY_ID);
+            prepStmt.setInt(1, id);
             ResultSet rs = prepStmt.executeQuery();
             Group group = null;
             if(rs.next()) {
@@ -162,7 +162,9 @@ abstract public class AbstractJDBCGroupDAO implements IGroupDAO<Integer> {
             if( group == null || group.getId() == null )
                 throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_GROUP_UPDATE.toString(), new NullPointerException());
             prepStmt = conn.prepareStatement(SQL_UPDATE_GROUP);
-            prepStmt.setInt(1, group.getId());
+            prepStmt.setString( 1, group.getName() );
+            prepStmt.setInt(2, group.getId());
+
             return prepStmt.executeUpdate();
 
         }catch(SQLException sqlExc){
