@@ -53,8 +53,13 @@ public class MysqlJdbcUserDAO extends AbstractJDBCUserDAO {
      *
      * @param limit  Максимальное количество выводимых клиентов. Если = -1, то без ограничения
      * @param offset Начальный индекс записи начала вывода
+     * @return Список пользователей
+     * @throws DAOException - в случае возникновения ошибок при выполнении SQL запросов или при передаче в качестве значения - null
+     *        в параметры limit или offset
      */
     public List<User> getList(Integer limit, Integer offset) throws DAOException {
+        if( limit == null || offset ==null )
+            throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_USER_LIST.toString(), new NullPointerException());
         PreparedStatement prepStmt = null;
         ArrayList<User> users = new ArrayList<>();
         try {
@@ -87,16 +92,18 @@ public class MysqlJdbcUserDAO extends AbstractJDBCUserDAO {
      * Создание нового пользователя
      * @param user Обяъект класса {@link User}
      * @return экземпляр класса {@link User} - в случае успешного добавления пользователя
+     * @throws DAOException - в случае возникновения ошибок при выполнении SQL запросов или при передаче в качестве значения - null
+     *        в поля параметра user или null - вместо user объекта (экземпляра класса {@link User})
      */
     public User create(User user) throws DAOException {
         if( user == null )
-            throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_USER_CREATE.toString());
+            throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_USER_CREATE.toString(), new NullPointerException());
         if( user.getFio() == null || user.getFio().trim().isEmpty() )
-            throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_USER_CREATE.toString());
+            throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_USER_CREATE.toString(), new NullPointerException());
         if( user.getBirthday() == null || user.getBirthday().toString().trim().isEmpty() )
-            throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_USER_CREATE.toString());
+            throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_USER_CREATE.toString(), new NullPointerException());
         if( user.getLogin() == null || user.getLogin().trim().isEmpty())
-            throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_USER_CREATE.toString());
+            throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_USER_CREATE.toString(), new NullPointerException());
 
         PreparedStatement prepStmt = null;
         String saltedPswd = null;

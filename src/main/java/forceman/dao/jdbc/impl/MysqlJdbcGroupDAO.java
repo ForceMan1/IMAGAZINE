@@ -43,12 +43,14 @@ public class MysqlJdbcGroupDAO extends AbstractJDBCGroupDAO {
      * Создание нового экземпляра класса {@link Group}
      *
      * @param group Объект класса @{link Group}
-     * @return сохраненный в БД объект класса {@link Group} с присвоенным ему уникальным идентификатором, или null - в случае group == null
+     * @return сохраненный в БД объект класса {@link Group} с присвоенным ему уникальным идентификатором
+     * @throws DAOException - в случае возникновения ошибок при выполнении SQL запросов или при передаче в качестве значения - null
+     *        в поле {@link Group#name}
      */
     @Override
     public Group create(Group group) throws DAOException {
-        if( group == null )
-            return null;
+        if( group == null || group.getName() == null )
+            throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_GROUP_CREATE.toString(), new NullPointerException());
         PreparedStatement prepStmt = null;
 
         try {
@@ -98,9 +100,14 @@ public class MysqlJdbcGroupDAO extends AbstractJDBCGroupDAO {
      *
      * @param limit  Максимальное количество выводимых записей. Если = -1, то без ограничения
      * @param offset Начальный индекс записи начала вывода
+     * @return Список групп полльзователей
+     * @throws DAOException - в случае возникновения ошибок при выполнении SQL запросов или при передаче в качестве значения - null
+     *        в параметры limit и offset
      */
     @Override
     public List<Group> getList(Integer limit, Integer offset) throws DAOException {
+        if(limit == null || offset == null)
+            throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_GROUP_LIST.toString(), new NullPointerException());
         PreparedStatement prepStmt = null;
         List<Group> groups = new ArrayList<>();
         try {

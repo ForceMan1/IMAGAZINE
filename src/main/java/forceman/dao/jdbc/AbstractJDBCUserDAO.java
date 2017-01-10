@@ -92,6 +92,10 @@ abstract public class AbstractJDBCUserDAO implements IUserDAO<Integer> {
 
     /**
      * Создание нового пользователя
+     * @param user Объект класса @{link User}
+     * @return Объект класса @{link User}, сохраненный в БД с присовоенным ему уникальным идентификатором
+     * @throws DAOException - в случае возникновения ошибок при выполнении SQL запросов или при передаче в качестве значения - null
+     *        в параметр user или его поля
       */
     abstract public User create(User user) throws DAOException;
 
@@ -99,13 +103,23 @@ abstract public class AbstractJDBCUserDAO implements IUserDAO<Integer> {
      * Получения списка экземпляров класса T
      * @param limit Максимальное количество выводимых записей. Если = -1, то без ограничения
      * @param offset Начальный индекс записи начала вывода
+     * @return Список пользователей
+     * @throws DAOException - в случае возникновения ошибок при выполнении SQL запросов или при передаче в качестве значения - null
+     *        в параметры limit или offset
      */
     abstract public List<User> getList(Integer limit, Integer offset) throws DAOException;
 
     /**
      * Удаление пользователя
+     * @param user Объект класса {@link User}, Однозначно характеризующий удаляемого пользователя по идентификатору пользователя
+     *             - поле {@link User#id}
+     * @return 1 - при удачном удалении пользователя
+     * @throws DAOException - в случае возникновения ошибок при выполнении SQL запросов или при передаче в качестве значения - null
+     *        в параметр user или его поле id.
      */
     public int delete(User user) throws DAOException {
+        if( user == null || user.getId() == null )
+            throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_USER_DELETE.toString(), new NullPointerException());
         PreparedStatement prepStmt = null;
         try {
             prepStmt = conn.prepareStatement(SQL_DELETE_USER);
@@ -125,8 +139,14 @@ abstract public class AbstractJDBCUserDAO implements IUserDAO<Integer> {
 
     /**
      * Поиск пользователя по идентификатору
+     * @param id Идентификатор пользователя
+     * @return Объект класса {@link User}, соотвествующее указанному идентифкатору или null - при отсутствии данного пользователя
+     * @throws DAOException - в случае возникновения ошибок при выполнении SQL запросов или при передаче в качестве значения - null
+     *        в параметре id
      */
     public User findById(Integer id) throws DAOException{
+        if( id == null )
+            throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_USER_FIND_BY_ID.toString(), new NullPointerException());
         PreparedStatement prepStmt = null;
         try {
             prepStmt = conn.prepareStatement(SQL_FIND_USER_BY_ID);

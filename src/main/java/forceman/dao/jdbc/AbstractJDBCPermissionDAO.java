@@ -85,11 +85,13 @@ abstract public class AbstractJDBCPermissionDAO implements IPermissionDAO<Intege
     /**
      * Сохранение права доступа в БД
      *
-     * @param entity Объект права доступа {@link Permission}
+     * @param permission Объект права доступа {@link Permission}
      * @return созданный экземпляр права доступа с присвоенным ему уникальным идентификатором
+     * @throws DAOException - в случае возникновения ошибок при выполнении SQL запросов или при передаче в качестве значения - null
+     *        в параметр permission или его поля
      */
     @Override
-    abstract public Permission create(Permission entity) throws DAOException;
+    abstract public Permission create(Permission permission) throws DAOException;
 
     /**
      * Удаление права доступа из БД по его идентификатору {@link Permission#id}
@@ -97,11 +99,13 @@ abstract public class AbstractJDBCPermissionDAO implements IPermissionDAO<Intege
      * @param permission Объект класса права доступа {@link Permission}, однозначно характеризующего
      *                  удалямое право доступа по его идентификатору {@link Permission#id}
      * @return 1 - в случае успешного удаления права доступа
+     * @throws DAOException - в случае возникновения ошибок при выполнении SQL запросов или при передаче в качестве значения - null
+     *        в параметр permission или его поля
      */
     @Override
     public int delete(Permission permission) throws DAOException {
         if( permission == null || permission.getId() == null )
-            return 0;
+            throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_PERMISSION_DELETE.toString(), new NullPointerException());
         PreparedStatement prepStmt = null;
         try {
             prepStmt = conn.prepareStatement(SQL_DELETE_PERMISSION);
@@ -124,11 +128,13 @@ abstract public class AbstractJDBCPermissionDAO implements IPermissionDAO<Intege
      *
      * @param id Идентификатор права доступа
      * @return Найденный объект права доступа {@link Permission} или null
+     * @throws DAOException - в случае возникновения ошибок при выполнении SQL запросов или при передаче в качестве значения - null
+     *        в параметр id
      */
     @Override
     public Permission findById(Integer id) throws DAOException {
         if( id == null )
-            return null;
+            throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_PERMISSION_FIND_BY_ID.toString(), new NullPointerException());
         PreparedStatement prepStmt = null;
         try {
             prepStmt = conn.prepareStatement(SQL_FIND_PERMISSION_BY_ID);
@@ -158,11 +164,13 @@ abstract public class AbstractJDBCPermissionDAO implements IPermissionDAO<Intege
      * @param permission Экземпляр класса {@link Permission}, однозначно характеризующий оюновляемое право
      *                   доступа по идентифкатору {@link Permission#id}
      * @return 1 - в случае успешного обновления права доступа
+     * @throws DAOException - в случае возникновения ошибок при выполнении SQL запросов или при передаче в качестве значения - null
+     *        в параметр permission или его поле id
      */
     @Override
     public int update(Permission permission) throws DAOException {
         if(permission == null || permission.getId() == null)
-            return 0;
+            throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_PERMISSION_UPDATE.toString(), new NullPointerException());
         PreparedStatement prepStmt = null;
         try {
             prepStmt = conn.prepareStatement(SQL_UPDATE_PERMISSION);
@@ -185,6 +193,7 @@ abstract public class AbstractJDBCPermissionDAO implements IPermissionDAO<Intege
     /**
      * Получение количества прав доступа
      * @return Количество прав доступа
+     * @throws DAOException - в случае возникновения ошибок при выполнении SQL запросов или при передаче в качестве значения - null
      */
     @Override
     public int getCount() throws DAOException {
@@ -213,6 +222,9 @@ abstract public class AbstractJDBCPermissionDAO implements IPermissionDAO<Intege
      *
      * @param limit  Максимальное количество выводимых записей. Если = -1, то без ограничения
      * @param offset Начальный индекс записи начала вывода
+     * @return Список прав доступа
+     * @throws DAOException - в случае возникновения ошибок при выполнении SQL запросов или при передаче в качестве значения - null
+     *        в параметры limit или offset
      */
     @Override
     abstract public List<Permission> getList(Integer limit, Integer offset) throws DAOException;

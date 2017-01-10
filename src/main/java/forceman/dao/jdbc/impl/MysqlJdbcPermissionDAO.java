@@ -41,11 +41,13 @@ public class MysqlJdbcPermissionDAO extends AbstractJDBCPermissionDAO {
      *
      * @param permission ќбъект права доступа {@link Permission}
      * @return созданный экземпл€р права доступа с присвоенным ему уникальным идентификатором
+     * @throws DAOException - в случае возникновени€ ошибок при выполнении SQL запросов или при передаче в качестве значени€ - null
+     *        в пол€ {@link Permission#code} или {@link Permission#name}
      */
     @Override
     public Permission create(Permission permission) throws DAOException {
-        if(permission == null)
-            return null;
+        if(permission == null || permission.getCode() == null || permission.getName() == null)
+            throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_PERMISSION_CREATE.toString(), new NullPointerException());
         PreparedStatement prepStmt = null;
         try {
             // ѕроверка инициализации таблицы последовательности дл€ прав доступа
@@ -96,12 +98,14 @@ public class MysqlJdbcPermissionDAO extends AbstractJDBCPermissionDAO {
      *
      * @param limit  ћаксимальное количество выводимых записей. ≈сли = -1, то без ограничени€
      * @param offset Ќачальный индекс записи начала вывода
-     * @return —писок прав доступа, null - в случае некорректных значений параметров limit и offset
+     * @return —писок прав доступа
+     * @throws DAOException - в случае возникновени€ ошибок при выполнении SQL запросов или при передаче в качестве значени€ - null
+     *        в параметры limit или offset
      */
     @Override
     public List<Permission> getList(Integer limit, Integer offset) throws DAOException {
         if(offset == null || limit == null)
-            return null;
+            throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_PERMISSION_LIST.toString(), new NullPointerException());
         List<Permission> permissions = new ArrayList<>();
         PreparedStatement prepStmt = null;
         try {

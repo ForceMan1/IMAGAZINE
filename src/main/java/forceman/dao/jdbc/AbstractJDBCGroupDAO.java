@@ -79,21 +79,28 @@ abstract public class AbstractJDBCGroupDAO implements IGroupDAO<Integer> {
      * Создание нового экземпляра класса {@link Group}
      *
      * @param entity Объект класса @{link Group}
-     * @return сохраненный в БД объект класса {@link Group} с присвоенным есц уникальным идентификатором
-     */
+     * @return сохраненный в БД объект класса {@link Group} с присвоенным ему уникальным идентификатором
+     * @throws DAOException - в случае возникновения ошибок при выполнении SQL запросов или при передаче в качестве значения - null
+     *
     @Override
     abstract public Group create(Group entity) throws DAOException;
 
     /**
      * Удаление группы пользователей из БД
      *
-     * @param entity Объект класса {@link Group}, однозначно по идентификатору характеризующий удаляемую запись в БД
+     * @param group Объект класса {@link Group}, однозначно по идентификатору характеризующий удаляемую запись в БД
+     * @return 1 - при успешном удалении группы пользователей
+     * @throws DAOException - в случае возникновения ошибок при выполнении SQL запросов или при передаче  null
+     *        в качестве параметра group или его поля id
      */
     @Override
-    public int delete(Group entity) throws DAOException {
+    public int delete(Group group) throws DAOException {
+        if( group == null || group.getId() != null )
+            throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_GROUP_DELETE.toString(), new NullPointerException());
         PreparedStatement prepStmt = null;
         try {
             prepStmt = conn.prepareStatement(SQL_DELETE_GROUP);
+            prepStmt.setInt(1, group.getId());
             return prepStmt.executeUpdate();
         }catch(SQLException sqlExc){
             throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_GROUP_DELETE.toString(), sqlExc);
@@ -111,13 +118,15 @@ abstract public class AbstractJDBCGroupDAO implements IGroupDAO<Integer> {
      *
      * @param id Идентификатор группы пользователей
      * @return объект класса {@link Group}, соотвествующий указанному идентификатору группы пользователей, или null - при отсутствии
+     * @throws DAOException - в случае возникновения ошибок при выполнении SQL запросов или при передаче в качестве значения - null
+     *        в параметр id
      */
     @Override
     public Group findById(Integer id) throws DAOException {
         PreparedStatement prepStmt = null;
         try {
             if( id == null )
-                return null;
+                throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_GROUP_FIND_BY_ID.toString(), new NullPointerException());
             prepStmt = conn.prepareStatement(SQL_FIND_GROUP_BY_NAME);
             ResultSet rs = prepStmt.executeQuery();
             Group group = null;
@@ -140,14 +149,18 @@ abstract public class AbstractJDBCGroupDAO implements IGroupDAO<Integer> {
     /**
      * Обновление группы пользователей в БД по указанным в параметре новым данным
      *
-     * @param group Объект класса {@link Group}, содержащий обновленные данные для обновляемой группы пользователей. Поле {@link Group#id} обязательно для заполнения
+     * @param group Объект класса {@link Group}, содержащий обновленные данные для обновляемой группы пользователей.
+     *              Поле {@link Group#id} обязательно для заполнения
+     * @return 1 - при успешном обновлении группы пользователей в БД
+     * @throws DAOException - в случае возникновения ошибок при выполнении SQL запросов или при передаче в качестве значения - null
+     *        в параметр group или его поля
      */
     @Override
     public int update(Group group) throws DAOException {
         PreparedStatement prepStmt = null;
         try {
             if( group == null || group.getId() == null )
-                return 0;
+                throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_GROUP_UPDATE.toString(), new NullPointerException());
             prepStmt = conn.prepareStatement(SQL_UPDATE_GROUP);
             prepStmt.setInt(1, group.getId());
             return prepStmt.executeUpdate();
@@ -167,6 +180,7 @@ abstract public class AbstractJDBCGroupDAO implements IGroupDAO<Integer> {
     /**
      * Получение количества групп пользователей в БД
      * @return  Количество групп пользователей в БД
+     * @throws DAOException - в случае возникновения ошибок при выполнении SQL запросов
      */
     @Override
     public int getCount() throws DAOException {
@@ -194,6 +208,8 @@ abstract public class AbstractJDBCGroupDAO implements IGroupDAO<Integer> {
      *
      * @param limit  Максимальное количество выводимых записей. Если = -1, то без ограничения
      * @param offset Начальный индекс записи начала вывода
+     * @throws DAOException - в случае возникновения ошибок при выполнении SQL запросов или при передаче в качестве значения - null
+     *        в параметры Limit или offset
      */
     @Override
     abstract public List<Group> getList(Integer limit, Integer offset) throws DAOException;
