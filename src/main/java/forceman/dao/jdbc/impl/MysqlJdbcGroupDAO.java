@@ -4,12 +4,13 @@ import forceman.dao.DAOException;
 import forceman.dao.DAOExceptionSource;
 import forceman.dao.jdbc.AbstractJDBCGroupDAO;
 import forceman.entity.Group;
-import forceman.entity.User;
+
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -95,15 +96,23 @@ public class MysqlJdbcGroupDAO extends AbstractJDBCGroupDAO {
     /**
      * Получения списка объектов класса {@link Group}, соотвествующим имеющимся в БД записям.
      *
-     * @param offset Начальный индекс записи начала вывода
      * @param limit  Максимальное количество выводимых записей. Если = -1, то без ограничения
+     * @param offset Начальный индекс записи начала вывода
      */
     @Override
-    public List<Group> getList(Integer offset, Integer limit) throws DAOException {
+    public List<Group> getList(Integer limit, Integer offset) throws DAOException {
         PreparedStatement prepStmt = null;
-        List<Group> groups = null;
+        List<Group> groups = new ArrayList<>();
         try {
             prepStmt = conn.prepareStatement(SQL_LIST_GROUP);
+            prepStmt.setInt(1, offset);
+            prepStmt.setInt(2, limit);
+            ResultSet rs = prepStmt.executeQuery();
+            while(rs.next()){
+                Group group = new Group( rs.getString("name") );
+                group.setId( rs.getInt("id") );
+                groups.add( group );
+            }
 
         }catch(SQLException sqlExc){
             throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_GROUP_LIST.toString(), sqlExc);
@@ -114,7 +123,7 @@ public class MysqlJdbcGroupDAO extends AbstractJDBCGroupDAO {
                 throw new DAOException(DAOExceptionSource.EXCEPTION_DAO_CLOSE_STATEMENT.toString(), closeExc);
             }
         }
-        return null;
+        return groups;
     }
 
     public MysqlJdbcGroupDAO(Connection conn){

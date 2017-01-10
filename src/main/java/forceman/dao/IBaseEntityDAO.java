@@ -40,8 +40,8 @@ public interface IBaseEntityDAO<T extends BaseEntity, V extends Number> {
 
     /**
      * Получения списка экземпляров класса T
-     * @param offset Начальный индекс записи начала вывода
      * @param limit Максимальное количество выводимых записей. Если = -1, то без ограничения
+     * @param offset Начальный индекс записи начала вывода
      */
-    public List<T> getList(V offset, V limit) throws DAOException;
+    public List<T> getList(V limit, V offset) throws DAOException;
 }

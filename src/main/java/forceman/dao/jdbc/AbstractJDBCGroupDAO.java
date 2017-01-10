@@ -10,7 +10,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.zip.DeflaterOutputStream;
 
 /**
  * Created by Igor on 21.12.2016.
@@ -193,9 +192,9 @@ abstract public class AbstractJDBCGroupDAO implements IGroupDAO<Integer> {
     /**
      * Получения списка объектов класса {@link Group}, соотвествующим имеющимся в БД записям.
      *
-     * @param offset Начальный индекс записи начала вывода
      * @param limit  Максимальное количество выводимых записей. Если = -1, то без ограничения
+     * @param offset Начальный индекс записи начала вывода
      */
     @Override
-    abstract public List<Group> getList(Integer offset, Integer limit) throws DAOException;
+    abstract public List<Group> getList(Integer limit, Integer offset) throws DAOException;
 }

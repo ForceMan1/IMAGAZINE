@@ -1,6 +1,7 @@
 package dao;
 
 import forceman.dao.DAOException;
+import forceman.dao.IUserDAO;
 import forceman.dao.jdbc.impl.MysqlJdbcUserDAO;
 import forceman.entity.User;
 import forceman.security.IPasswordHash;
@@ -8,7 +9,6 @@ import forceman.security.PasswordHash;
 import org.junit.*;
 import org.junit.runners.MethodSorters;
 
-import java.security.SecureRandom;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -25,7 +25,7 @@ import java.util.List;
 public class JdbcUserDAOJUnitTest  extends Assert {
     private Connection conn = null;
     private IPasswordHash pswdHashImpl = new PasswordHash("SHA-256");
-    private MysqlJdbcUserDAO userDAO = null;
+    private IUserDAO<Integer> userDAO = null;
 
     @Before
     public void initTest() throws SQLException {
@@ -119,7 +119,7 @@ public class JdbcUserDAOJUnitTest  extends Assert {
     @Test
     public void _3000_delete_all_users() throws DAOException {
         int count = userDAO.getCount();
-        List<User> users = userDAO.getList(count, 0);
+        List<User> users = userDAO.getList(0, count);
 
         Iterator<User> iterUser = users.iterator();
         while( iterUser.hasNext() ) {

@@ -23,7 +23,15 @@ public enum DAOExceptionSource {
     EXCEPTION_DAO_GROUP_UPDATE("При обновлении группу пользователей произошла ошибка"),
     EXCEPTION_DAO_GROUP_COUNT("При получении количества групп пользователей произошла ошибка"),
     EXCEPTION_DAO_GROUP_CREATE("Ошибка при создании новой группы"),
-    EXCEPTION_DAO_GROUP_LIST("Ошибка при получении списка групп пользователей");
+    EXCEPTION_DAO_GROUP_LIST("Ошибка при получении списка групп пользователей"),
+
+    EXCEPTION_DAO_PERMISSION_DELETE("Ошибка при удалении права доступа"),
+    EXCEPTION_DAO_PERMISSION_FIND_BY_ID("Ошибка при поиске права доступа по его идентифкатору"),
+    EXCEPTION_DAO_PERMISSION_UPDATE("Ошибка при обновлении права доступа"),
+    EXCEPTION_DAO_PERMISSION_COUNT("Ошибка при получении количества прав доступа"),
+    EXCEPTION_DAO_PERMISSION_FIND_BY_CODE("Ошибка при поиске права доступа по его коду"),
+    EXCEPTION_DAO_PERMISSION_CREATE("Ошибка при создании права доступа"),
+    EXCEPTION_DAO_PERMISSION_LIST("Ошибка при получении списка прав доступа");
 
 
     /**

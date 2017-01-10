@@ -97,10 +97,10 @@ abstract public class AbstractJDBCUserDAO implements IUserDAO<Integer> {
 
     /**
      * Получения списка экземпляров класса T
-     * @param offset Начальный индекс записи начала вывода
      * @param limit Максимальное количество выводимых записей. Если = -1, то без ограничения
+     * @param offset Начальный индекс записи начала вывода
      */
-    abstract public List<User> getList(Integer offset, Integer limit) throws DAOException;
+    abstract public List<User> getList(Integer limit, Integer offset) throws DAOException;
 
     /**
      * Удаление пользователя

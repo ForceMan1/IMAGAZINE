@@ -5,7 +5,6 @@ import forceman.dao.DAOExceptionSource;
 import forceman.dao.jdbc.AbstractJDBCUserDAO;
 import forceman.entity.User;
 import forceman.security.IPasswordHash;
-import forceman.security.PasswordHash;
 
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
@@ -13,7 +12,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -53,10 +51,10 @@ public class MysqlJdbcUserDAO extends AbstractJDBCUserDAO {
     /**
      * Функция получения списка пользователей
      *
-     * @param offset Начальный индекс записи начала вывода
      * @param limit  Максимальное количество выводимых клиентов. Если = -1, то без ограничения
+     * @param offset Начальный индекс записи начала вывода
      */
-    public List<User> getList(Integer offset, Integer limit) throws DAOException {
+    public List<User> getList(Integer limit, Integer offset) throws DAOException {
         PreparedStatement prepStmt = null;
         ArrayList<User> users = new ArrayList<>();
         try {
