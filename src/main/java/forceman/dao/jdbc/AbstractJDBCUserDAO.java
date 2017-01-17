@@ -6,6 +6,7 @@ import forceman.dao.IUserDAO;
 import forceman.entity.User;
 import forceman.security.IPasswordHash;
 
+import javax.sql.DataSource;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -73,24 +74,27 @@ abstract public class AbstractJDBCUserDAO implements IUserDAO<Integer> {
      */
     protected Connection conn;
 
+    protected DataSource ds;
+
    /**
      *
-     * @param conn Коннектор соединения с БД
-     */
-    public AbstractJDBCUserDAO(Connection conn, IPasswordHash pswdHashImpl){
-        this.conn = conn;
+    * @param ds DataSource БД
+    */
+    public AbstractJDBCUserDAO(DataSource ds, IPasswordHash pswdHashImpl) throws SQLException {
+        this.ds = ds;
+        conn = ds.getConnection();
         this.pswdHashImpl = pswdHashImpl;
     }
 
-   public Connection getConn() {
-        return conn;
+   public DataSource getDs() {
+        return ds;
     }
 
-   public void setConn(Connection conn) {
-        this.conn = conn;
+   public void setDs(DataSource ds) {
+        this.ds = ds;
     }
 
-    /**
+      /**
      * Создание нового пользователя
      * @param user Объект класса @{link User}
      * @return Объект класса @{link User}, сохраненный в БД с присовоенным ему уникальным идентификатором

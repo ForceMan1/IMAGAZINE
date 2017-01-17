@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Created by Igor on 12.01.2017.
  */
-public interface IService<V_USER extends Number, V_GROUP extends Number, V_PERM extends Number> {
+public interface IService<V extends Number> {
     /** USER ****************/
     /**
      * Сохранение нового пользователя {@link User}
@@ -26,7 +26,7 @@ public interface IService<V_USER extends Number, V_GROUP extends Number, V_PERM 
      * @return 1 - в случае успешного создания пользователя
      * @throws DAOException
      */
-    public int deleteById(V_USER id) throws DAOException;
+    public int deleteById(V id) throws DAOException;
 
     /**
      * Поиск экземпляра по идентификатору
@@ -34,7 +34,7 @@ public interface IService<V_USER extends Number, V_GROUP extends Number, V_PERM 
      * @return Объект класса {@link User}
      * @throws DAOException
      */
-    public User findById(V_USER id) throws DAOException;
+    public User findById(V id) throws DAOException;
 
     /**
      * Обновление данных
@@ -49,7 +49,7 @@ public interface IService<V_USER extends Number, V_GROUP extends Number, V_PERM 
      * @return Количество пользователей
      * @throws DAOException
      */
-    public int getCount() throws DAOException;
+    public int getCountUsers() throws DAOException;
 
     /**
      * Получения списка пользователей
@@ -57,5 +57,5 @@ public interface IService<V_USER extends Number, V_GROUP extends Number, V_PERM 
      * @param offset Начальный индекс записи начала вывода
      * @throws DAOException
      */
-    public List<User> getList(Integer limit, Integer offset) throws DAOException;
+    public List<User> getListUsers(Integer limit, Integer offset) throws DAOException;
 }

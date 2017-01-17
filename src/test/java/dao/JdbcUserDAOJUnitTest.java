@@ -9,6 +9,8 @@ import forceman.security.PasswordHash;
 import org.junit.*;
 import org.junit.runners.MethodSorters;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -17,6 +19,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+
+import javax.naming.NamingException;
+import javax.sql.DataSource;
 
 /**
  * Created by Igor on 22.12.2016.
@@ -28,17 +33,22 @@ public class JdbcUserDAOJUnitTest  extends Assert {
     private IUserDAO<Integer> userDAO = null;
 
     @Before
-    public void initTest() throws SQLException {
+    public void initTest() throws SQLException, NamingException
+    {
+        /**
         String url = "jdbc:mysql://localhost:3306/magazine";
         String username = "magazine";
         String password = "magazine";
 
-        //try {
-            conn = DriverManager.getConnection(url, username, password);
-            userDAO = new MysqlJdbcUserDAO(conn, pswdHashImpl);
-        //}catch(SQLException sqlExc){
-        //    throw SQL
-        //}
+        conn = DriverManager.getConnection(url, username, password);
+        userDAO = new MysqlJdbcUserDAO(conn, pswdHashImpl);
+        */
+
+        Context initContext = new InitialContext();
+        Context webContext = (Context)initContext.lookup("java:/comp/env");
+
+        DataSource ds = (DataSource) webContext.lookup("jdbc/DSMagazine");
+
     }
 
     // Удаление всех созданных пользователей

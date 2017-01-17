@@ -6,6 +6,7 @@ import forceman.dao.jdbc.AbstractJDBCUserDAO;
 import forceman.entity.User;
 import forceman.security.IPasswordHash;
 
+import javax.sql.DataSource;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -43,8 +44,8 @@ public class MysqlJdbcUserDAO extends AbstractJDBCUserDAO {
     /**
      * Конструктор с параметром объекта соединения до БД
     */
-    public MysqlJdbcUserDAO(Connection conn, IPasswordHash pswdHashImpl){
-        super(conn, pswdHashImpl);
+    public MysqlJdbcUserDAO(DataSource ds, IPasswordHash pswdHashImpl) throws SQLException {
+        super(ds, pswdHashImpl);
     }
 
 
